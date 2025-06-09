@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Новая вкладка</title>
+  <!-- icon for URL -->
+  <link rel="shortcut icon" type="x-icon" href="img/chrome.png">
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100vh;
+      background-color: #ffffff;
+      font-family: Arial, sans-serif;
+      overflow-x: hidden;
+    }
+
+    body::-webkit-scrollbar {
+      display: none;
+    }
+
+    .google-header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      box-sizing: border-box;
+    }
+
+    .menu-icon {
+      width: 24px;
+      height: 24px;
+    }
+
+    .google-img {
+      width: 272px;
+      height: 90px;
+      margin-top: 150px;
+      margin-bottom: 50px;
+    }
+
+    .apps {
+      display: flex;
+      gap: 10px;
+    }
+
+    .apps img {
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+    }
+
+    .profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #666;
+    }
+
+    .profile img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    .logo {
+      width: 272px;
+      margin: 50px 0 20px;
+    }
+
+    .search-box {
+      width: 600px;
+      max-width: 90%;
+      display: flex;
+      align-items: center;
+      background: white;
+      border-radius: 24px;
+      padding: 10px 15px;
+      box-shadow: 0 1px 6px rgba(32, 33, 36, 0.28);
+      position: relative;
+    }
+
+    .search-box input {
+      width: 100%;
+      border: none;
+      outline: none;
+      font-size: 16px;
+      padding: 8px;
+    }
+
+    .search-box .icon {
+      margin-right: 10px;
+      font-size: 20px;
+      color: gray;
+    }
+
+    .search-box .mic {
+      font-size: 20px;
+      color: gray;
+      cursor: pointer;
+    }
+
+    .results {
+      width: 600px;
+      height: 40%;
+      max-width: 90%;
+      margin-top: 10px;
+      border-radius: 8px;
+      box-shadow: 0 1px 6px rgba(32, 33, 36, 0.28);
+      padding: 10px;
+      /* opacity: 0.2; */
+      display: none;
+      overflow-x: hidden;
+    }
+
+    .results::-webkit-scrollbar {
+      display: none;
+    }
+
+    .results ul {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .results li {
+      padding: 8px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .results li:last-child {
+      border-bottom: none;
+    }
+
+    .results li span {
+      font-weight: bold;
+    }
+
+    /* #search-input {
+      opacity: 0.2;
+    } */
+  </style>
+</head>
+
+<body>
+  <div class="google-header">
+    <div class="app"></div>
+    <div class="profile">
+      <span>Gmail</span>
+      <span>Images</span>
+      <img class="menu-icon" src="./img/menu.png" alt="Profile">
+      <img src="https://www.gstatic.com/images/branding/product/1x/avatar_circle_blue_120dp.png" alt="Profile">
+    </div>
+  </div>
+  <img class="google-img" src="./img/google-logo.png" class="logo" alt="Google" width="272" height="90">
+
+  <div class="search-box">
+    <img src="./svg/search_icon.svg" alt="Search Icon" width="20" height="20">
+    <input id="search-input" type="text" placeholder="Search Google or type a URL" autocomplete="off">
+    <img src="./img/mic.webp" alt="Mic Icon" width="30" height="30">
+  </div>
+
+  <div class="results" id="results">
+    <ul id="results-list"></ul>
+  </div>
+
+  <script>
+    const searchInput = document.getElementById('search-input')
+    const resultsDiv = document.getElementById('results')
+    const resultsList = document.getElementById('results-list')
+
+    const questionsAndAnswers = [
+      {
+        question: "Aqshaǵa bolǵan mútajlik tómendegiler menen belgilenedi",
+        answer: "tovar birjasınıń rawajlanıwı"
+      },
+      {
+        question: "Pul...",
+        answer: "tovar hám xızmetler ózine túser bahası"
+      },
+      {
+        question: "Tólew quralı retinde pul qollanıladı...",
+        answer: "tovar-pul ayırbaslawda"
+      },
+      {
+        question: "Aylanbadaǵı pul...",
+        answer: "aylanıs hám tólew quralı funksiyası"
+      },
+      {
+        question: "Puldıń baha ólshewi wazıypası puldıń qábiletin ańlatadı ?",
+        answer: "barlıq tovarlar ózine túser bahasın ólshew "
+      },
+      {
+        question: "Házirgi waqıtta jáhán pulları wazıypasın tiykarlanıp ….. valyutalar atqaradı",
+        answer: "erkin konvertatsiya etiletuǵın "
+      },
+      {
+        question: "Puldıń real bahası tómendegiler menen belgilenedi",
+        answer: "puldıń satıp alınǵan zat qábileti"
+      },
+      {
+        question: "Islep shıǵarıw kólemin kópewiwinen aylanbadaǵı pul muǵdarınıń kóbeyiwi tómendegilerge alıp keledi",
+        answer: "puldıń qádirsizleniwi"
+      },
+      {
+        question: "Insan kapitalı bul: ",
+        answer: "Shaxslar hám pútkil jámiettiiń túrli mútajliklerin qandırıw ushın paydalaniletuǵın bilim, kónlikpe hám ilmiy tájriybeler kompleksi"
+      },
+      {
+        question: "Qarıydardıń jeke fondları tómendegilerden ibarat",
+        answer: "Keleshekte mútajliklerdi qandırıw ushın arnalǵan xalıq pul dáramatlarınıń tóplanǵan bólegi"
+      },
+      {
+        question: "Búgingi kúnde banknotanıń haqıyqıy bahası tómendegilerdiń bahası menen belgilenedi",
+        answer: "ol menen satıp alınatuǵın tovarlar hám xızmetler"
+      },
+      {
+        question: "Pul massasınıń eń likvidli bólegi",
+        answer: "naq pul"
+      },
+      {
+        question: "Veksel, banknot hám shek ……puldıń túrleri",
+        answer: "kredit"
+      },
+      {
+        question: "Tólewshiniń bankke óz esabınan málim summanı alıwshınıń esap betine ótkeriw tuwrısındaǵı buyrıǵın óz ishine alǵan tólew hújjeti",
+        answer: "tólew tapsırıqnaması"
+      },
+      {
+        question: "Naq pulsiz esap-kitaplar ?",
+        answer: "belgilengen formadaǵı tólew hújjetleri tiykarında hám tiyisli hújjet aylanıwına ámel etken halda ámelge asıriladı"
+      },
+      {
+        question: "Pul massasınıń eń likvidli bólegi",
+        answer: "naq pul"
+      },
+      {
+        question: "Inflyatsiya túrleri",
+        answer: "talap inflyaciyası (tutınıwshılar inflyaciyası) hám qárejetler inflyaciyası"
+      },
+      {
+        question: "Inflyatsiya",
+        answer: "puldıń satıp alınǵan zat qábiletiniń tómenlewi nátiyjesinde bahalardıń asıwı procesi"
+      },
+      {
+        question: "Mámleket ishinde tovarlar hám xızmetler ushın tólewler",
+        answer: "tek milliy valyutada"
+      },
+      {
+        question: "Inflyatsiyanıń sebepleri",
+        answer: "artıqsha pul emissiyasi"
+      },
+      {
+        question: "Inflyatsiya fondlarǵa qanday tásir etedi",
+        answer: "fondlardı qadrsizlentiredi"
+      },
+      {
+        question: "Emissiya ne",
+        answer: "Aylanısge pul yamasa qımbatlı qaǵazlardı shıǵarıw"
+      },
+      {
+        question: "Byudjet - bul... ",
+        answer: "Dáramat hámqárejetler jobası"
+      },
+      {
+        question: "Depozitlerdıń túrleri",
+        answer: "Ashıq (talap boyınsha ) hám múddetli"
+      },
+      {
+        question: "Devalvatsiya - bul",
+        answer: "milliy valyutanıń basqa mámleketler valyutalarına salıstırǵanda rásmiy kurstıń tómenlewi"
+      },
+      {
+        question: "Qayta bahalaw – bul",
+        answer: "milliy valyutanıń rásmiy kurstıń asıwı"
+      },
+      {
+        question: "Kredit pullarına kiredi",
+        answer: "veksel"
+      },
+      {
+        question: "Veksel degen ne",
+        answer: "Banktiń vekseli, qarız alıwshınıń onda kórsetilgen múddet tamam bolǵannan keyin qarız beriwshige belgili summanıtólew boyınsha abstrakt jazba hám daw-jánjelsiz minnetlemesi"
+      },
+      {
+        question: "Amanat degen ne",
+        answer: "Qániygelestirilgen finans-kredit mákemesinde saqlaw ushın jaylastırılgan hárqanday aktivler"
+      },
+      {
+        question: "Qolaysız nátiyje itimalın azaytıw hám depozitler boyınsha múmkin bolǵan joǵaltıwlardı saplastırıw minimallastırıwǵa qaratılǵan qararlardı qabıl etiw hám ámelge asırıw procesi",
+        answer: "Depozit riskin basqarıw"
+      },
+      {
+        question: "Amanat boyinsha procentlerdi kapitallastırıw qashan...",
+        answer: "amanat boyınsha esaplanǵan procentler amanatqa qosıladı, hám keyingi procentler de olardıń muǵdarı boyınsha esaplanadı"
+      },
+      {
+        question: "Depozittiń real stavkası qansha",
+        answer: "inflyaciyaǵa beyimlestirilgen nominal stavka"
+      },
+      {
+        question: "Amanat saqlawshınıń bankke jaylastırılǵan pullarınan paydalanılǵanlıǵı ushın jıyma qansha",
+        answer: "qızıǵıw"
+      },
+      {
+        question: "Bank-kredit shólkemi bolip, jámi bolip tómendegi bank operaciyaların ámelge asırıwdıń ayrıqsha huqıqına iye",
+        answer: "Barlıq juwaplar duris"
+      },
+      {
+        question: "Depozit esap beti ashıladı",
+        answer: "Fizikalıq hám yuridikalıq shaxslar ushın"
+      },
+      {
+        question: "Kreditke mútájlikti belgilewshi faktorlar",
+        answer: "óndiris cikliniń úzliksizligin támiyinlew"
+      },
+      {
+        question: "Bankler ssudalardi tómendegi principlerge ámel etken halda beredi",
+        answer: "qıstawlılıq, tólem, pariqlaw, qaytarıw, maqsetli paydalanıw"
+      },
+      {
+        question: "Kredit qatnasıqlarınıń júzege keliw shártleri tómendegilerden ibarat",
+        answer: "Barlıq juwaplar duris"
+      },
+      {
+        question: "Qarız kapitalınıń derekleri",
+        answer: "Barlıq juwaplar duris."
+      },
+      {
+        question: "Ekonomikanı rawajlandırıw hám nátiyjeliligin arttırıwda kredittiń áhmiyeti sonnan ibarat, kredit",
+        answer: "reproduktiv procestiń úzliksizligine járdem beredi"
+      },
+      {
+        question: "Kredit qatnasıqları strukturasınıń elementleri tómendegiler",
+        answer: "Qarız beriwshi,qarız alıwshı hám kredit summası"
+      },
+      {
+        question: "Tólem - kredittiń.... ",
+        answer: "princip"
+      },
+      {
+        question: "Kommerciyalıq kredit",
+        answer: "satıwshıdan qarıydarǵa tovar kórinisindegi kredit, belgili muǵdarındaǵı ónim yamasa puldı bir kárxanadan ekinshi kárxanaǵa kreditke ótkeriw"
+      },
+      {
+        question: "Bank krediti - bul",
+        answer: "bank tárepinen belgili múddetke hám belgilishártlerde beriletuǵın pul summası"
+      },
+      {
+        question: "Tutınıw krediti",
+        answer: "xizmeti nátiyjelerinen dáramat alǵan fizikalıq táreplerge tovarlar (xızmetler) satıp alıwǵa bolǵan talapların qanaatlandırıw maqsetindeberiletuǵin kredit"
+      },
+      {
+        question: "Banklerdiń payda bolıwına tómendegiler sebep boladı",
+        answer: "tovar-pul qatnasıqlarınıń rawajlanıwı, sanaat hám tovar kapital aylanısınıń tezlesiwi, kredit qosılmalarına bolǵan talaptıń artıwı"
+      },
+      {
+        question: "Banklerdiń funkciyaları",
+        answer: "Barlıq juwaplar duris"
+      },
+      {
+        question: "Nizam hújjetlerine muwapıq qanday operaciyalar bank operaciyaları dizimine kirgizilmegen",
+        answer: "sawda operaciyaları"
+      },
+      {
+        question: "Bank sistemasınıń birinshi dárejesi",
+        answer: "Oraylıq bank"
+      },
+      {
+        question: "Házirgi zaman ekonomikada kredittiń eńkeń tarqalǵan forması",
+        answer: "bank xizmeti"
+      },
+      {
+        question: "Ózbekstan Respublikasında bank xizmeti tómendegi jagdaylarda ámelge asırılıwı múmkin",
+        answer: "Ózbekstan Respublikası Oraylıq bankiniń licenziyası"
+      },
+      {
+        question: "Ózbekstan Respublikası Oraylıq banki",
+        answer: "mámleketke tiyisli, emitent bank"
+      },
+      {
+        question: "Kommerciyalıq bankler qanday operaciyalardı ámelge asırıwı múmkin",
+        answer: "depozitlerdi tartıw hámqarjılardı jaylastırıw, esap-kitap operaciyaları, kreditlew"
+      },
+      {
+        question: "Kommerciyalıq banktiń resursları tómendegilerden ibarat",
+        answer: "óz hám qarız islengen qarjılar jıyındısı"
+      },
+      {
+        question: "operaciyaları - bankler hám basqa kredit shólkemleriniń yuridikalıq hám fizikalıq shaxslardıń qarjıların tartıw boyınsha operaciyaları",
+        answer: "Depozit"
+      },
+      {
+        question: "Kommerciyalıq banktiń akcionerlik operaciyaları tómendegiler boyınsha operaciyaları esaplanadı",
+        answer: "Finans bazarında qımbat bahalı qaǵazlardı satıp aliw hám satiw"
+      },
+      {
+        question: "Kommerciyalıq banktiń kassa operaciyaları tómendegiler boyınsha operaciyalar esaplanadı",
+        answer: "Naq puldı qabıllaw hám beriw"
+      },
+      {
+        question: "Naq pulsız tólemler...",
+        answer: "pul qarjıları esaptan shıǵarılǵanda bank esapbetlerindegi jazıwlar boyınsha pul esap-kitaplari tólewshiniń esapbetine hám alıwshınıń esapbetine ótkeriledi"
+      },
+      {
+        question: "Naq pulsız esap-kitap formaları",
+        answer: "akkreditiv, tólem tapsırmaları, chekler boyınsha esap-kitaplar, tólem tapsırmaları, rejeli tólemler boyınsha esapkitaplar"
+      },
+      {
+        question: "Erte tólem",
+        answer: "bul shártnama múddeti tamamlanbaǵansha pul minnetlemesin orınlaw"
+      },
+      {
+        question: "Veksel, banknot hám chek...... pul túrleri esaplanadi",
+        answer: "kredit"
+      },
+      {
+        question: "Tólewshiniń bankke óz esabınan belgili summanı alıwshınıń esabınaótkeriw haqqındaǵı buyrıǵın óz ishine alǵan tólem hújjeti dep ataladı",
+        answer: "tólem tapsırıqnaması"
+      },
+      {
+        question: "Naq pulsız esap-kitaplar",
+        answer: "belgilengen formadaǵı esap-kitap hújjetleri tiykarında hám tiyisli hújjet aylanısına ámel etken jaǵdayda pul qarjıların tólewshi hám alıwshıdan alınǵan túsimler tiykarında"
+      },
+      {
+        question: "Maqsetine qaray bank kartaları tómendegilerge bóliniwi múmkin",
+        answer: "Esap-kitap, kredit hám aldınnan tólem"
+      },
+      {
+        question: "Tólem (debet) kartası tómendegilerge arnalǵan",
+        answer: "Onıń iyesi tárepinen operaciyalardı shıǵarıw limiti sheńberinde ámelge asırıw - klienttiń onıńbank esap betindegi qarjıları muǵdarı"
+      },
+      {
+        question: "Tutınıwshınıń jeke qorları tómendegilerden ibarat",
+        answer: "Keleshekte mútájliklerdi qanaatlandırıw ushın mólsherlengen xalıqtıń pul dáramatlarınıń toplanǵan bólimi"
+      },
+      {
+        question: "Bank - kredit shólkemi bolıp, jámi tómendegi bank operaciyaların ámelge asırıwdıńayrıqsha huqıqına iye",
+        answer: "Barlıq juwaplar duris"
+      },
+      {
+        question: "Birjada olardı satadı hám satıp aladı",
+        answer: "qimbat bahalı qaǵazlar"
+      },
+      {
+        question: "Akciyanı shıǵarıwda belgilengen bahası",
+        answer: "nominal "
+      },
+      {
+        question: "Esap-kitap forması - bank operaciyası bolıp, onıń járdeminde emitent bank klienttiń tapsirıǵınatiykarında hám onıń esabınan esap-kitap hújjetleri tiykarında tólewshiden tólemdi alıw boyınsha háreketlerdiorınlaydı",
+        answer: "jıynaw "
+      },
+      {
+        question: "Tólem tapsırıqnaması bul...",
+        answer: "Esapbet iyesiniń (tólewshiniń) oǵan xizmet kórsetiwshi bankke alıwshınıń sol yaki basqa bankte ashılǵan esap betine belgili muǵdarda pul ótkeriw haqqındaǵı tólem hújjeti menen rásmiylestirilgen buyrıǵı"
+      },
+      {
+        question: "Kredit pullardiń túrleri",
+        answer: "Vekseller, chekler, bank plastik kartochkaları"
+      },
+      {
+        question: "Milliy valyutanıń shet el valyutasına salıstırǵandaǵı kursınıń páseyiwi dep",
+        answer: "devalvaciya"
+      },
+      {
+        question: "Fond birjasında satıwshı hám qarıydar ortasında dáldalshı bolǵan yuridikalıq yaki fizikalıq shaxs",
+        answer: "Broker"
+      },
+      {
+        question: "Xalıqtıń birlemshi dáramatlarına tómendegiler kiredi",
+        answer: "miynet haqı"
+      },
+      {
+        question: "Xalıq tárepinen tólenetuǵın májbúriy tólemler quramına tómendegiler kiredi",
+        answer: "salıqlar"
+      },
+      {
+        question: "Elektron puldıń ózine tán ózgesheligi nede ?",
+        answer: "Barlıq juwap durıs"
+      },
+      {
+        question: "Naq pul emes pullarǵa tómendegiler kiredi",
+        answer: "bank kartasındaǵı qarjılar"
+      },
+      {
+        question: "Qamsızlandırıw polisin qaysı shólkemnen satıp alıwıńız múmkin?",
+        answer: "qamsızlandırıw kompaniyası"
+      },
+      {
+        question: "Investiciya degen ne ?",
+        answer: "dáramattı kóbeytiw maqsetinde aktivlerdi satıp aliw"
+      },
+      {
+        question: "Túrli investiciyalıq aktivlerdiń tartımlılıǵın qanday parametrler boyinsha bahalaw múmkin?",
+        answer: "Barlıq juwap durıs"
+      },
+      {
+        question: "Aktivlerdiń rentabelligi degen ne?",
+        answer: "aktivke investiciya etiwden alıngan payda (investiciya etilgen summadan payız sipatında"
+      },
+      {
+        question: "Tómendegi aktivlerden qaysısı eń likvidliesaplanadi?",
+        answer: "naq pul"
+      },
+      {
+        question: "Investiciyalawda risklerdi qanday basqariw usinis etiledi?",
+        answer: "tek paydalı, likvidli hám isenimli aktivlerge investiciya etiń"
+      },
+      {
+        question: "Investiciya strategiyası degen ne?",
+        answer: "investiciya portfelin qáliplestiriwge uliwma qatnas"
+      },
+      {
+        question: "Aktivlerdiń isenimliligi degen ne?",
+        answer: "aktivtiń risklerge qaramastan turaqlı dáramat alıw qábileti"
+      },
+      {
+        question: "Aktivtiń likvidligi",
+        answer: "Aktivti tez hám joǵaltıwsız pulǵa aylandırıw qábileti"
+      },
+      {
+        question: "Byudjettiń artıqmashılıǵı - bul",
+        answer: "Byudjet dáramatlarınıń onıń qárejetlerinen artıp ketiwi"
+      },
+      {
+        question: "Ózbekstan Respublikasında salıqlardı óndiriw qaysi mámleketlik organına júkletilgen?",
+        answer: "Mámleketlik salıq xizmeti"
+      },
+      {
+        question: "Finanslıq aldawshılıq - bul",
+        answer: "iskerlik túri aldaw jolı menen dáramat alıw"
+      },
+      {
+        question: "Tómendegilerden qaysi birin aldawshılıq dep klassifikaciyalaw múmkin?",
+        answer: "investiciya kompaniyası barlıq tólemlerdi tek ǵana jańa investorlardıń qarjıların tartıw arqalı ámelge asıradı asıradı"
+      },
+      {
+        question: "Finanslıq piramidanıń tiykarģı ózgesheligi nede?",
+        answer: "answdáramatlar klientlerge tek jana investorlardan tartılgan qarjılar esabınan tólenedier"
+      },
+      {
+        question: "Jalǵan operaciyalardan bank kartasındaǵı joǵaltıwlardı qalay azaytıw múmkin?",
+        answer: "Barlıq juwap durıs"
+      },
+      {
+        question: "Finanslıq piramida óz agzalarına kóbeygen dáramattı tólewge uqiplı investorlar",
+        answer: "waqtinsha, jańa investorlardan qarjılar aģımı bar bolganda"
+      },
+      {
+        question: "Qorlar ne ushın arnalǵan",
+        answer: "Barlıq juwap durıs"
+      },
+      {
+        question: "Bul investiciyalardan qaysı biri finanslıq aktiv esaplanadı?",
+        answer: "Altın qazıp alıwshı kompaniyanıń akciyaları"
+      },
+      {
+        question: "Investiciyadan alıngan payda ushin sıylıq bolip tabıladı",
+        answer: "Barlıq juwap durıs"
+      },
+      {
+        question: "Salıqqa tartıwdıń tiykarǵı maqseti ne?",
+        answer: "Mámleketlik byudjetti toltırıw hám ekonomikalıq turaqlılıqtı támiyinlew"
+      },
+      {
+        question: "Kreditti qanday tólew usılları bar?",
+        answer: "Kredittiń túrine qaray, aylıq, jıllıq yamasa bir retlik tólewler menen"
+      },
+      {
+        question: "Operaciya túrleri boyınsha tólem kartalarınıń túrleri",
+        answer: "Debet, kredit, aldınnan tólem hám overdraft kartaları"
+      },
+    ]
+
+    searchInput.addEventListener('input', () => {
+      const query = searchInput.value.toLowerCase()
+      resultsList.innerHTML = ''
+
+      if (query.trim() === '') {
+        resultsDiv.style.display = 'none'
+        return
+      }
+
+      const filteredResults = questionsAndAnswers.filter(qa => qa.question.toLowerCase().includes(query))
+
+      if (filteredResults.length > 0) {
+        filteredResults.forEach(qa => {
+          const li = document.createElement('li')
+          li.innerHTML = `${qa.question}<br>${qa.answer}`
+          resultsList.appendChild(li)
+        })
+        resultsDiv.style.display = 'block'
+      } else {
+        resultsDiv.style.display = 'none'
+      }
+    });
+  </script>
+</body>
+
+</html>
